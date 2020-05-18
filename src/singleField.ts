@@ -1,5 +1,3 @@
-
-
 class SingleField{
     x:number;
     y:number;
