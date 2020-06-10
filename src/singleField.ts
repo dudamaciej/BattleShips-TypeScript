@@ -2,19 +2,19 @@ class SingleField{
     x:number;
     y:number;
     isHit:boolean;
+    isShipPart:boolean;
+    id:string;
 
     constructor(x:number, y:number){
         this.x = x;
         this.y = y;
         this.isHit = false;
+        this.isShipPart = false;
+        this.id =`${x}${y}`;
     }
 
-    getX(){
-        return this.x;
-    }
-
-    getY(){
-        return this.y;
+    partOfShip(){
+        this.isShipPart = true;   
     }
 
     takeHit() {

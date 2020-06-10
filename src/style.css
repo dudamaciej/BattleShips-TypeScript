@@ -33,13 +33,28 @@
 .destroyed{
     background-color:rgb(7, 7, 7) ;
 }
-.singleGarageSpot{
+.ship{
+    background-color:rgb(31, 51, 68);
+}
+#shipGarage{
+    display: flex;
     border: 1px solid rgb(4, 46, 80);
+    flex-direction: column;
+    width:300px;
+    height:200px;
+    padding: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+
+}
+.singleGarageSpot{
+    width: 150px;
+    height:30;
+    
 }
 .shipDiv{
     position: absolute;
-    width:150px;
-    height:30px;
+    
 }
 .partOfShip{
     position: absolute;
