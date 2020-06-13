@@ -1,118 +1,428 @@
 import newsingleField from '../src/singleField';
 import Ship from '../src/ship';
 import SingleField from '../src/singleField';
+import { shipTypes, directionTypes } from '../src/enums';
 
-class Game{
+class Game {
 
     playerBoard: HTMLDivElement = document.querySelector('#playerBoard');
     enemyBoard: HTMLDivElement = document.querySelector('#enemyBoard');
-    fleetGarage:HTMLDivElement = document.querySelector('#shipGarage');
+    fleetGarage: HTMLDivElement = document.querySelector('#shipGarage');
 
     shipNameInput: HTMLInputElement = document.querySelector('#shipNameInput');
     foreCoordinatesInput: HTMLInputElement = document.querySelector('#foreCoordinatesInput');
     directionInput: HTMLInputElement = document.querySelector('#directionInput');
     setShipsBtn: HTMLButtonElement = document.querySelector('#setBtn');
 
-    playerBattleField: number[];
-    enemyBattleField: number[];
-    player:string;
-    enemy:string;
-    fleetSize:number;
-  
-    constructor(){
-        this.fleetSize = 5;
+    playerBattleField: SingleField[];
+    enemyBattleField: SingleField[];
+    player: string;
+    enemy: string;
+    currentTurn: string;
+    playerShipFleet: Ship[];
+    enemyShipFleet: Ship[];
+    playerBoardBin: number[][];
+    gameStatus: string;
+
+    constructor() {
+        this.playerShipFleet = [];
+        this.enemyShipFleet = [];
         this.playerBattleField = [];
         this.enemyBattleField = [];
         this.player = "player";
         this.enemy = "enemy";
+        this.currentTurn = "none";
+        this.gameStatus = "preparation"
+        //this.showInstruction();
+        this.playerBoardBin = this.createArrayWithO();
         this.createBoard(this.playerBoard, this.playerBattleField, this.player);
         this.createBoard(this.enemyBoard, this.enemyBattleField, this.enemy);
 
-        this.setEnemyShips(this.enemyBattleField);
-        if(this.fleetSize != 0){ 
-        this.setShipsBtn.addEventListener('click',()=>this.setShipOnBoard(this.shipNameInput.value,this.foreCoordinatesInput.value,this.directionInput.value,this.playerBattleField,this.fleetSize));
-        }
-        this.enemyBoard.addEventListener('click',()=>this.playerShoot(event,this.enemyBattleField));
+        this.gameTime();
     }
-    setShipOnBoard(shipNameInput,startCoordinatesInput,directionInput,playerField,fleetSize){
-        var fleetSize = fleetSize;
-        var shipName = shipNameInput;
-        var numberOfFields = shipName.slice(1,2);
-        var startCoordinates = startCoordinatesInput;
-        var startX = startCoordinates.slice(0,1);
-        var startY = startCoordinates.slice(1,2);
-        var direction = directionInput;
-        
-        let newShip = new Ship(startX,startY,shipName,direction)
-        let firstBoxOfShip  = playerField.find(value => value.id ===startCoordinates);
-        firstBoxOfShip.partOfShip();
-        newShip.shipFields.push(firstBoxOfShip);
+    //gdy ustawimy nasze statki to bot ustawia swoje i po tym mozna strzelac
+    gameTime() {
+        while (this.gameStatus != "end") {
 
-        for(var i = 1; i < numberOfFields; i++){
-
-            if( direction == 'D' ){
-
-                var newStartX = parseInt(startX) + i;
-                var nextBoxOfShip = playerField.find(value => value.id ===`${ newStartX}${startY}`); 
-              
+            if (this.gameStatus == "preparation") {
+                while (this.playerShipFleet.length < 5) {
+                    this.setShipsBtn.addEventListener('click', () => this.setShipOnBoard(this.shipNameInput.value, this.foreCoordinatesInput.value, this.directionInput.value, this.playerBattleField, this.playerShipFleet));
+                }
+                this.setEnemyShips(this.enemyShipFleet, this.enemyBattleField);
             }
-            else if(direction == "R"){
+            if (this.playerShipFleet.length == 5) {
 
-                var newStartY = parseInt(startY) + i;
-                var nextBoxOfShip = playerField.find(value=> value.id===`${ startX}${newStartY}`);
-                
+                this.gameStatus = "war";
+                this.currentTurn = "player";
             }
-            nextBoxOfShip.partOfShip();
-               //nextBoxOfShip.classList.add('ship');
-               newShip.shipFields.push(nextBoxOfShip);
+
+
+            while (this.currentTurn == "player") {
+                this.enemyBoard.addEventListener('click', () => this.playerShoot(event, this.enemyBattleField, this.enemyShipFleet));
+            }
+            while (this.currentTurn == "enemy") {
+                this.enemyShoot(this.playerShipFleet, this.playerBattleField);
+            }
         }
-       
-        console.log(newShip);
+
+    }
+    setShipOnBoard(shipNameInput, startCoordinatesInput, directionInput, playerField, shipsFleet) {
+        let existingShip = shipsFleet.find(ship => ship.name === shipNameInput);
+        if (!existingShip) {
+
+            if ((<any>Object).values(shipTypes).includes(shipNameInput)) {
+
+                if ((<any>Object).values(directionTypes).includes(directionInput)) {
+                    var shipName = shipNameInput;
+                    var numberOfFields = shipName.slice(1, 2);
+                    var startCoordinates = startCoordinatesInput;
+                    var startX = startCoordinates.slice(0, 1);
+                    var startY = startCoordinates.slice(1, 2);
+                    var direction = directionInput;
+
+                    if (this.playerBoardBin[parseInt(startX)][parseInt(startY)] === 0) {
+                        let newShip = new Ship(startX, startY, shipName, direction)
+                        let firstBoxOfShip = playerField.find(value => value.id === startCoordinates);
+                        firstBoxOfShip.partOfShip();
+                        newShip.shipFields.push(firstBoxOfShip);
+                        this.playerBoardBin[parseInt(startX)][parseInt(startY)] = 1;
+
+                        for (var i = 1; i < numberOfFields; i++) {
+
+                            if (direction == 'D') {
+
+                                var newStartX = parseInt(startX) + i;
+                                var nextBoxOfShip = playerField.find(value => value.id === `${newStartX}${startY}`);
+                                this.playerBoardBin[newStartX][parseInt(startY)] = 1;
+                            }
+                            else if (direction == "R") {
+
+                                var newStartY = parseInt(startY) + i;
+                                var nextBoxOfShip = playerField.find(value => value.id === `${startX}${newStartY}`);
+                                this.playerBoardBin[parseInt(startX)][newStartY] = 1;
+                            }
+                            nextBoxOfShip.partOfShip();
+                            newShip.shipFields.push(nextBoxOfShip);
+                        }
+                        this.playerShipFleet.push(newShip);
+                        console.log(newShip);
+                    } else {
+                        console.log("There is ship")
+                    }
+                } else {
+                    console.log("Wrong direction")
+                }
+
+            } else {
+                console.log(`${shipNameInput} - wrong name`)
+            }
+
+        } else {
+            console.log(`${shipNameInput} already exist`)
+        }
+
     }
 
-    setEnemyShips(enemyField){
-        var availableFields = enemyField;
-        for( var i = 1; i <= this.fleetSize; i++){
 
-            let randomId = `${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
-            let firstBoxOfShip = enemyField.find(value=>value.id === randomId);
+    setEnemyShips(enemyFleet, enemyField) {
+        let choosenSetUp = this.randomSetUpEnemyShips()
+        enemyField.forEach(field => {
+            let x = parseInt(field.id.substring(0, 1));
+            let y = parseInt(field.id.substring(1, 2));
+            if (choosenSetUp[x][y] === 1) {
+                let name = "s1";
+                let direction = "";
+                let existingShip = enemyFleet.find(ship => ship.name === name);
+                let currentField = enemyField.find(value => value.id === `${x}${y}`);
+                if (!existingShip) {
+                    if (choosenSetUp[x][y + 1] === 1) {
+                        direction = "R";
+                    } else {
+                        direction = "D";
+                    }
+                    let newShip = new Ship(x, y, name, direction);
+                    currentField.partOfShip(name);
+                    newShip.shipFields.push(currentField);
+                    enemyFleet.push(newShip);
+                } else {
+                    currentField.partOfShip(name);
+                    existingShip.shipFields.push(currentField);
+                }
+
+            } else if (choosenSetUp[x][y] === 2) {
+                let name = "s2";
+                let direction = "";
+                let existingShip = enemyFleet.find(ship => ship.name === name);
+                let currentField = enemyField.find(value => value.id === `${x}${y}`);
+                if (!existingShip) {
+                    if (choosenSetUp[x][y + 1] === 2) {
+                        direction = "R";
+                    } else {
+                        direction = "D";
+                    }
+                    let newShip = new Ship(x, y, name, direction);
+                    currentField.partOfShip(name);
+                    newShip.shipFields.push(currentField);
+                    enemyFleet.push(newShip);
+                } else {
+                    currentField.partOfShip(name);
+                    existingShip.shipFields.push(currentField);
+                }
+            } else if (choosenSetUp[x][y] === 3) {
+                let name = "s3";
+                let direction = "";
+                let existingShip = enemyFleet.find(ship => ship.name === name);
+                let currentField = enemyField.find(value => value.id === `${x}${y}`);
+                if (!existingShip) {
+                    if (choosenSetUp[x][y + 1] === 3) {
+                        direction = "R";
+                    } else {
+                        direction = "D";
+                    }
+                    let newShip = new Ship(x, y, name, direction);
+                    currentField.partOfShip(name);
+                    newShip.shipFields.push(currentField);
+                    enemyFleet.push(newShip);
+                } else {
+                    currentField.partOfShip(name);
+                    existingShip.shipFields.push(currentField);
+                }
+            } else if (choosenSetUp[x][y] === 4) {
+                let name = "s4";
+                let direction = "";
+                let existingShip = enemyFleet.find(ship => ship.name === name);
+                let currentField = enemyField.find(value => value.id === `${x}${y}`);
+                if (!existingShip) {
+                    if (choosenSetUp[x][y + 1] === 4) {
+                        direction = "R";
+                    } else {
+                        direction = "D";
+                    }
+                    let newShip = new Ship(x, y, name, direction);
+                    currentField.partOfShip(name);
+                    newShip.shipFields.push(currentField);
+                    enemyFleet.push(newShip);
+                } else {
+                    currentField.partOfShip(name);
+                    existingShip.shipFields.push(currentField);
+                }
+            } else if (choosenSetUp[x][y] === 5) {
+                let name = "s5";
+                let direction = "";
+                let existingShip = enemyFleet.find(ship => ship.name === name);
+                let currentField = enemyField.find(value => value.id === `${x}${y}`);
+                if (!existingShip) {
+                    if (choosenSetUp[x][y + 1] === 5) {
+                        direction = "R";
+                    } else {
+                        direction = "D";
+                    }
+                    let newShip = new Ship(x, y, name, direction);
+                    currentField.partOfShip(name);
+                    newShip.shipFields.push(currentField);
+                    enemyFleet.push(newShip);
+                } else {
+                    currentField.partOfShip(name);
+                    existingShip.shipFields.push(currentField);
+                }
+            }
+        });
+
+    }
+
+    playerShoot(e, enemyField, enemyShipFleet) {
+        var id = e.target.id.substring(5, 7);
+        var shootedField = enemyField.find(value => value.id === id);
+        if (shootedField.isHit == true) {
+            console.log("You shoted this field");
+        } else {
+            shootedField.takeHit();
+            if (shootedField.isShipPart == true) {
+                var attackedShip = enemyShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
+                console.log("You hit ship");
+                if (attackedShip.isItSunked() == true) {
+                    console.log(`You destoryed ${attackedShip.name}`);
+                    attackedShip.isSunked();
+                    let shipIndexInFleet = enemyShipFleet.indexOf(attackedShip);
+                    enemyShipFleet.splice(shipIndexInFleet, 1);
+                    this.isGameEnd();
+                }
+
+            } else {
+                console.log("You missed");
+                this.currentTurn = "enemy";
+            }
         }
     }
 
-    playerShoot(e,enemyField){
-        var id = e.target.id.substring(5,7);
-        console.log(id);
-        var shootedField = enemyField.find(value=> value.id===id);
-        if(shootedField.isShipPart == true){
-            // zaznaczamy, ze trafiony
-            //czy statek ma jakies czesci jesli nie, to kolor zatopiony
-            //sprawdzam czy sa jakies statki jesli tak to player shoot sie powtarza, az nie trafi lub sie skoncza statki
-        }else{
-            // zaznaczam, ze pudlo i przekazuje ture botowi
+    enemyShoot(playerShipFleet, playerBattleField) {
+
+        let shootedField = playerBattleField[Math.floor(Math.random() * this.playerBattleField.length)]
+        if (shootedField.isHit == true) {
+        } else {
+            shootedField.takeHit();
+            if (shootedField.isShipPart == true) {
+                var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
+                console.log("Enemy hit ship");
+                while (attackedShip.isItSunked() == false) {
+
+                    let shootDirecion = ["D", "R", "L", "U"][Math.floor(Math.random() * 3)];
+                    let newX = shootedField.x;
+                    let newY = shootedField.y;
+                    switch (shootDirecion) {
+                        case "D":
+                            if (shootedField.x != 9) {
+                                newX = shootedField.x + 1;
+                            }
+                            break;
+                        case "R":
+                            if (shootedField.y != 9) {
+                                newY = shootedField.y + 1;
+                            }
+                            break;
+                        case "L":
+                            if (shootedField.y != 0) {
+                                newY = shootedField.y - 1;
+                            }
+                            break;
+                        case "U":
+                            if (shootedField.x != 0) {
+                                newX = shootedField.x - 1;
+                            }
+                    }
+                    let newShootedField = playerBattleField.find(field => field.id === `${newX}${newY}`);
+                    newShootedField.takeHit();
+                    newShootedField = shootedField;
+                    if (shootedField.isShipPart == true) {
+                        var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
+                        console.log("Enemy hit ship");
+                    } else {
+                        console.log("Enemy missed");
+                        this.currentTurn = "player";
+                        break;
+                    }
+                }
+                if (attackedShip.isItSunked() == true) {
+                    console.log(`Enemy destoryed ${attackedShip.name}`);
+                    attackedShip.isSunked();
+                    let shipIndexInFleet = playerShipFleet.indexOf(attackedShip);
+                    playerShipFleet.splice(shipIndexInFleet, 1);
+                    this.isGameEnd();
+                }
+
+            } else {
+                console.log("Enemy missed");
+                this.currentTurn = "player";
+            }
         }
+
+
+
+
     }
 
-    createBoard(parent, battleField, owner){
+    isGameEnd() {
+        if (this.currentTurn == "player") {
+            if (this.enemyShipFleet.length == 0) {
+                console.log('PLAYER WON');
+                this.gameStatus = "end";
+            }
+        } else if (this.currentTurn == "enemy") {
+            if (this.playerShipFleet.length == 0) {
+                console.log('ENEMY WON');
+                this.gameStatus = "end";
+            }
+        }
+    }
+    createBoard(parent, battleField, owner) {
 
-        for(var i = 0; i < 10; i ++){
-           
-            for(var j = 0; j< 10; j++){
+        for (var i = 0; i < 10; i++) {
 
-                var singleField = new newsingleField(i,j);
+            for (var j = 0; j < 10; j++) {
+
                 const divsingleField = document.createElement('div');
+                var singleField = new newsingleField(i, j, divsingleField);
                 divsingleField.classList.add('singleField');
-                var topPosition = j * 50;
-                var leftPosition = i * 50;
-                divsingleField.id = `${owner}${j}${i}`
+                var topPosition = i * 50;
+                var leftPosition = j * 50;
+                divsingleField.id = `${owner}${i}${j}`
                 divsingleField.style.top = topPosition + 'px';
-                divsingleField.style.left = leftPosition+ 'px';
+                divsingleField.style.left = leftPosition + 'px';
                 parent.appendChild(divsingleField);
                 battleField.push(singleField);
 
             }
-        }  
-        console.log(battleField);   
+        }
+        console.log(battleField);
     }
-    
+    createArrayWithO() {
+        let newArray = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        return newArray;
+    }
+    randomSetUpEnemyShips() {
+        let shipSetUp;
+        let random = Math.floor(Math.random() * 3) + 1;
+        switch (random) {
+            case 1:
+                shipSetUp = [
+                    [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+                    [0, 3, 3, 3, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 5, 0, 0, 4, 4, 4, 4, 0, 0],
+                    [0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 5, 0, 0, 0, 0, 0, 0, 0, 0]
+                ]
+                break;
+            case 2:
+                shipSetUp = [
+                    [0, 0, 0, 0, 2, 2, 0, 0, 3, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 3, 0],
+                    [0, 0, 0, 1, 0, 0, 0, 0, 3, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 4, 4, 4, 4, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 5, 5, 5, 5, 5, 0, 0, 0, 0]
+                ]
+                break;
+            case 3:
+                shipSetUp = [
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 3, 3, 3, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 5, 0, 0, 0, 0],
+                    [4, 4, 4, 4, 0, 5, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 5, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 5, 0, 0, 2, 0],
+                    [0, 0, 0, 0, 0, 5, 0, 0, 2, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0]
+                ]
+                break;
+        }
+        return shipSetUp;
+    }
+    showInstruction() {
+        console.log(`                            INSTRUCTION \n
+                    1.Set your 5 ships on board \n
+                    2.Start shooting and have fun :)`)
+    }
 }
 export default Game;

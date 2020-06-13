@@ -1,5 +1,7 @@
+import SingleField from "./singleField";
+
 class Ship {
-    shipFields: string[];
+    shipFields: SingleField[];
     shipLength:number;
     startX:number;
     startY:number;
@@ -12,7 +14,25 @@ class Ship {
         this.name = name;
         this.direction = direction;
         this.shipFields = [];
-        this.isSunk = false
+        this.isSunk = false;
+    }
+    isSunked(){
+        this.isSunk = true;
+        this.shipFields.forEach(element => {
+            element.body.classList.add('destroyed')
+        });
+    }
+    isItSunked(){
+        let checkerArray =[];
+       this.shipFields.forEach(element=>{
+           element.isHit 
+           checkerArray.push(element.isHit);
+       })
+       if(checkerArray.every(Boolean)){
+           return true;
+       }else{
+           return false;
+       }
     }
 }
 export default Ship;
