@@ -1,37 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>BattleShips</title>
 </head>
+
 <body>
-<div class="container">
-    <div class="titleBox">BattleShips</div>
-    <div class="controlBox">
-        <div class ="shipFleetBox">
-            <div class="txtBox">SET YOUR SHIPS</div>
-            <input type="text" id="shipNameInput"placeholder="shipName [s1,s2,s3,s4,s5]">
-            <input type="text" id="foreCoordinatesInput"placeholder="fore Coordinates [01,23,...]">
-            <input type="text" id="directionInput"placeholder="Direction [D - down, R - right]">
-            <button class="button" id="setBtn">SET</button>
-           
+    <div class="container">
+        <div class="titleBox">BATTLE SHIPS</div>
+        <div class="setUpBox">
+            <div class="boxHeader">SET YOUR SHIPS</div>
+            <div class="controls">
+                <input type="text" onfocus="this.value=''" id="shipNameInput" placeholder="shipName [s1,s2,s3,s4,s5]">
+                <input type="text" onfocus="this.value=''" id="foreCoordinatesInput" placeholder="fore Coordinates [01,23,...]">
+                <input type="text" onfocus="this.value=''" id="directionInput" placeholder="Direction [D - down, R - right]">
+                <button class="button" id="setBtn">SET</button>
+            </div>
         </div>
-    </div>
-    <div class="boardsContainer">
-        <div id="playerBox" class="gameBox">
-            <div class="boxHeader">PLAYER BOARD</div>
-            <div id="playerBoard" class="gameBoard"></div>
+        <div class="boardsContainer">
+            <div id="playerBox" class="gameBox">
+                <div class="boxHeader">PLAYER BOARD</div>
+                <div id="playerBoard" class="gameBoard"></div>
+            </div>
+            <div id="enemyBox" class="gameBox">
+                <div class="boxHeader">ENEMY BOARD</div>
+                <div id="enemyBoard" class="gameBoard"></div>
+            </div>
         </div>
-        <div id="enemyBox"class="gameBox">
-            <div class="boxHeader">ENEMY BOARD</div>
-            <div id="enemyBoard" class="gameBoard"></div>
+        <div class="scoreBoard">
+            <div class="scoreValue"></div>
+            <button class="clearBtn" id="clearScoreBtn">CLEAR SCORE</button>
         </div>
     </div>
 
-</div>
-
-<script type="text/javascript" src="../dist/app.js"></script>
+    <script type="text/javascript" src="../dist/app.js"></script>
 </body>
+
 </html>

@@ -1,38 +1,151 @@
-.container{
+body {
+    background-color: rgb(195, 212, 230);
+}
 
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.titleBox{
 
+.titleBox {
+    font-weight: bold;
+    text-align: center;
+    font-size: 40px;
 }
-.boardsContainer{
 
+.setUpBox {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.gameBox{
-    
+
+.controls input {
+    border: 4px solid rgb(14, 43, 68);
+    padding: 5px;
+    margin-right: 10px;
+    font-weight: bold;
+    color: black;
 }
-.boxHeader{
-    
+
+.controls input:focus {
+    border: 3px solid#f6b93b !important;
+    outline: none;
 }
-.gameBoard{
-    position:relative;
-    width:500px;
-    height:500px;
+
+.controls button {
+    color: #131212;
+    background: #ffffff;
+    padding: 5px 15px 5px 15px;
+    border: 2px solid rgb(14, 43, 68);
+    transition: all 0.4s ease 0s;
+    font-weight: bold;
 }
-.singleField{
+
+.controls button:hover {
+    cursor: pointer;
+    color: #ffffff;
+    background: #f6b93b;
+    border-color: #f6b93b;
+    transition: all 0.4s ease 0s;
+    font-weight: bold;
+    padding: 5px 20px 5px 20px;
+    outline: none;
+}
+
+.boardsContainer {
+    margin-top: 70px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.gameBox {
+    margin-right: 50px;
+}
+
+.boxHeader {
+    font-weight: bold;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.gameBoard {
+    background-color: white;
+    position: relative;
+    width: 500px;
+    height: 500px;
+    border: 5px solid rgb(14, 43, 68)
+}
+
+.singleField {
     border: 1px solid rgb(72, 159, 231);
     position: absolute;
-	width:50px;
-	height:50px;
+    width: 50px;
+    height: 50px;
 }
-.missed{
-    background-color:rgb(129, 129, 129) ;
+
+.singleField:hover {
+    cursor: pointer;
+    background: #f6b93b;
+    border-color: #f6b93b;
 }
-.hit{
-    background-color:rgb(168, 20, 20) ;
+
+.missed {
+    background-color: rgb(129, 129, 129);
 }
-.destroyed{
-    background-color:rgb(7, 7, 7) ;
+
+.hit {
+    background-color: rgb(168, 20, 20);
 }
-.ship{
-    background-color:rgb(68, 135, 194);
+
+.destroyed {
+    background-color: rgb(7, 7, 7);
+}
+
+.ship {
+    background-color: rgb(68, 135, 194);
+}
+
+.scoreBoard {
+    margin-top: 30px;
+    margin-right: 30px;
+    padding: 20px;
+    border: 5px solid rgb(14, 43, 68);
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.scoreValue {
+    font-weight: bold;
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.clearBtn {
+    color: #131212;
+    background: #ffffff;
+    padding: 5px 15px 5px 15px;
+    border: 2px solid rgb(14, 43, 68);
+    transition: all 0.4s ease 0s;
+    font-weight: bold;
+}
+
+.clearBtn:hover {
+    cursor: pointer;
+    color: #ffffff;
+    background: #b3351f;
+    border-color: #b3351f;
+    transition: all 0.4s ease 0s;
+    font-weight: bold;
+    outline: none;
 }

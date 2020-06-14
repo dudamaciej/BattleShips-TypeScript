@@ -30,8 +30,7 @@ class SingleField{
             this.body.classList.add('hit');
         }else{
             this.body.classList.add('missed');
-        }
-        
+        }  
     }
 
 }

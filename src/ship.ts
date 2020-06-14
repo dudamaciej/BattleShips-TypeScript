@@ -16,12 +16,14 @@ class Ship {
         this.shipFields = [];
         this.isSunk = false;
     }
+
     isSunked(){
         this.isSunk = true;
         this.shipFields.forEach(element => {
             element.body.classList.add('destroyed')
         });
     }
+    
     isItSunked(){
         let checkerArray =[];
        this.shipFields.forEach(element=>{
