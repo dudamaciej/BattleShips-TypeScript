@@ -39,11 +39,9 @@ class Game {
         this.enemy = "enemy";
         this.currentTurn = "none";
         this.gameStatus = "preparation"
-        this.playerScore = 0;
-        this.enemyScore = 0;
         
-        this.score = `${this.playerScore}:${this.enemyScore}`;
-        this.scoreValue.innerHTML = this.score;
+        this.setScoreInLocalStroage();
+
         this.playerBoardBin = this.createArrayWithO();
 
         this.createBoard(this.playerBoard, this.playerBattleField, this.player);
@@ -51,10 +49,23 @@ class Game {
         this.setShipsBtn.addEventListener('click', () => this.setShipOnBoard(this.shipNameInput.value, this.foreCoordinatesInput.value, this.directionInput.value, this.playerBattleField, this.playerShipFleet));
         this.enemyBoard.addEventListener('click', () => this.playerShoot(event, this.enemyBattleField, this.enemyShipFleet));
         this.clearScoreBtn.addEventListener('click',()=>this.clearScore())
-        this.chceckScoreInLocalStroage();
+       
     }
 
-    chceckScoreInLocalStroage(){
+    setScoreInLocalStroage(){
+        if(localStorage.getItem("score") === "undefined") {
+            this.playerScore = 0;
+            this.enemyScore = 0;
+            this.score = `${this.playerScore}:${this.enemyScore}`;
+            localStorage.setItem("score", this.score);
+            this.scoreValue.innerHTML = this.score;
+        }else{
+            var score = localStorage.getItem("score");
+            this.playerScore = parseInt(score.slice(0,1));
+            this.enemyScore = parseInt(score.slice(2,3));
+            this.scoreValue.innerHTML = `${this.playerScore}:${this.enemyScore}`;
+        }
+       
         
     }
     clearScore(){
@@ -62,6 +73,7 @@ class Game {
         this.enemyScore = 0;
         this.score = `${this.playerScore}:${this.enemyScore}`;
         this.scoreValue.innerHTML = this.score;
+        localStorage.setItem("score", this.score);
     }
 
     setShipOnBoard(shipNameInput, startCoordinatesInput, directionInput, playerField, shipsFleet) {
@@ -336,7 +348,6 @@ class Game {
                 console.log('PLAYER WON');
                 this.gameStatus = "end";
                 this.playerScore ++;
-                console.log(this.playerScore)
                 this.reloadGame()
             }
         } else if (this.currentTurn == "enemy") {
@@ -364,6 +375,7 @@ class Game {
         this.createBoard(this.enemyBoard, this.enemyBattleField, this.enemy);
         this.score = `${this.playerScore}:${this.enemyScore}`;
         this.scoreValue.innerHTML = this.score;
+        localStorage.setItem("score",this.score);
        
     }
 
