@@ -48,8 +48,7 @@ class Game {
         this.createBoard(this.enemyBoard, this.enemyBattleField, this.enemy);
         this.setShipsBtn.addEventListener('click', () => this.setShipOnBoard(this.shipNameInput.value, this.foreCoordinatesInput.value, this.directionInput.value, this.playerBattleField, this.playerShipFleet));
         this.enemyBoard.addEventListener('click', () => this.playerShoot(event, this.enemyBattleField, this.enemyShipFleet));
-        this.clearScoreBtn.addEventListener('click',()=>this.clearScore())
-       
+        this.clearScoreBtn.addEventListener('click',()=>this.clearScore())   
     }
 
     setScoreInLocalStroage(){
@@ -95,7 +94,8 @@ class Game {
                         if (this.playerBoardBin[parseInt(startX)][parseInt(startY)] === 0) {
                             let newShip = new Ship(startX, startY, shipName, direction)
                             let firstBoxOfShip = playerField.find(value => value.id === startCoordinates);
-                            firstBoxOfShip.partOfShip(shipName);
+                            firstBoxOfShip.partOfShip(shipName)
+                            firstBoxOfShip.addShipClass();
                             newShip.shipFields.push(firstBoxOfShip);
                             this.playerBoardBin[parseInt(startX)][parseInt(startY)] = 1;
 
@@ -113,7 +113,8 @@ class Game {
                                     var nextBoxOfShip = playerField.find(value => value.id === `${startX}${newStartY}`);
                                     this.playerBoardBin[parseInt(startX)][newStartY] = 1;
                                 }
-                                nextBoxOfShip.partOfShip(shipName);
+                                nextBoxOfShip.partOfShip(shipName)
+                                nextBoxOfShip.addShipClass();
                                 newShip.shipFields.push(nextBoxOfShip);
                             }
                             this.playerShipFleet.push(newShip);
@@ -242,9 +243,10 @@ class Game {
                     currentField.partOfShip(name);
                     existingShip.shipFields.push(currentField);
                 }
+
             }
         });
-
+        console.log("Enemy set ships on board");
     }
 
     playerShoot(e, enemyField, enemyShipFleet) {

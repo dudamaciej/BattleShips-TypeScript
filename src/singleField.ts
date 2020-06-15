@@ -18,9 +18,11 @@ class SingleField{
     }
 
     partOfShip(shipname){
-        this.isShipPart = true;
-        this.body.classList.add('ship');   
+        this.isShipPart = true; 
         this.partOfWhatShip = shipname;
+    }
+    addShipClass(){
+        this.body.classList.add('ship');   
     }
 
     takeHit() {
