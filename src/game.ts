@@ -29,6 +29,7 @@ class Game {
     score: string;
     playerScore: number;
     enemyScore: number;
+
     constructor() {
         this.playerShipFleet = [];
         this.enemyShipFleet = [];
@@ -50,12 +51,17 @@ class Game {
         this.setShipsBtn.addEventListener('click', () => this.setShipOnBoard(this.shipNameInput.value, this.foreCoordinatesInput.value, this.directionInput.value, this.playerBattleField, this.playerShipFleet));
         this.enemyBoard.addEventListener('click', () => this.playerShoot(event, this.enemyBattleField, this.enemyShipFleet));
         this.clearScoreBtn.addEventListener('click',()=>this.clearScore())
-        
+        this.chceckScoreInLocalStroage();
     }
 
+    chceckScoreInLocalStroage(){
+        
+    }
     clearScore(){
         this.playerScore = 0;
         this.enemyScore = 0;
+        this.score = `${this.playerScore}:${this.enemyScore}`;
+        this.scoreValue.innerHTML = this.score;
     }
 
     setShipOnBoard(shipNameInput, startCoordinatesInput, directionInput, playerField, shipsFleet) {
@@ -269,8 +275,8 @@ class Game {
                     if (shootedField.isShipPart == true) {
                         var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
                         console.log("Enemy hit your ship");
-                        while (attackedShip.isItSunked() != true && this.currentTurn == "enemy") {
-                            let shootDirecion = ["D", "R", "L", "U"][Math.floor(Math.random() * 3)];
+                        while (!attackedShip.isItSunked() && this.currentTurn == "enemy") {
+                            let shootDirecion = ["D", "R", "L", "U"][Math.floor(Math.random() * 4)];
                             let newX = shootedField.x;
                             let newY = shootedField.y;
                             switch (shootDirecion) {
@@ -300,6 +306,7 @@ class Game {
                             if (shootedField.isShipPart == true) {
                                 var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
                                 console.log("Enemy hit ship");
+                                break;
                             } else {
                                 console.log("Enemy missed");
                                 this.currentTurn = "player";
@@ -356,6 +363,8 @@ class Game {
         this.createBoard(this.playerBoard, this.playerBattleField, this.player);
         this.createBoard(this.enemyBoard, this.enemyBattleField, this.enemy);
         this.score = `${this.playerScore}:${this.enemyScore}`;
+        this.scoreValue.innerHTML = this.score;
+       
     }
 
     clearBoard(parent) {
