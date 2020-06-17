@@ -288,7 +288,7 @@ class Game {
                     shootedField.takeHit();
                     if (shootedField.isShipPart == true) {
                         var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
-                        console.log("Enemy hit your ship");
+                        console.log(`Enemy hit your ship in ${shootedField.x}${shootedField.y}`);
                         while (!attackedShip.isItSunked() && this.currentTurn == "enemy") {
                             let shootDirecion = ["D", "R", "L", "U"][Math.floor(Math.random() * 4)];
                             let newX = shootedField.x;
@@ -297,25 +297,40 @@ class Game {
                                 case "D":
                                     if (shootedField.x != 9) {
                                         newX = shootedField.x + 1;
+                                    }else{
+                                        console.log("cant shoot over the board");
+                                        newX = shootedField.x - 1;
                                     }
                                     break;
                                 case "R":
                                     if (shootedField.y != 9) {
                                         newY = shootedField.y + 1;
                                     }
+                                    else{
+                                        console.log("cant shoot over the board");
+                                        newY = shootedField.y - 1;
+                                    }
                                     break;
                                 case "L":
                                     if (shootedField.y != 0) {
                                         newY = shootedField.y - 1;
+                                    }else{
+                                        console.log("cant shoot over the board");
+                                        newY = shootedField.x + 1;
                                     }
                                     break;
                                 case "U":
                                     if (shootedField.x != 0) {
                                         newX = shootedField.x - 1;
+                                    }else{
+                                        console.log("cant shoot over the board");
+                                        newX = shootedField.x + 1;
                                     }
+                                    break;
                             }
                             let newShootedField = playerBattleField.find(field => field.id === `${newX}${newY}`);
                             newShootedField.takeHit();
+                            console.log(shootDirecion,newX,newY);
                             newShootedField = shootedField;
                             if (shootedField.isShipPart == true) {
                                 var attackedShip = playerShipFleet.find(ship => ship.name === shootedField.partOfWhatShip);
